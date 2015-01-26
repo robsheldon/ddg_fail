@@ -32,7 +32,7 @@
 
     //  2. Get a list of search queries.
     //  Thank you to http://giantdorks.org/alain/export-chrome-or-chromium-browsing-history-on-linux/
-    exec("sqlite3 /tmp/chromium_history \"select datetime(last_visit_time/1000000-11644473600,'unixepoch','localtime'),url from urls where url like '%google.com/search%' or url like '%duckduckgo.com%' order by last_visit_time asc\"", $results);
+    exec("sqlite3 /tmp/chromium_history \"select datetime(last_visit_time/1000000-11644473600,'unixepoch','localtime'),url from urls where url like '%google.com/%' or url like '%duckduckgo.com%' order by last_visit_time asc\"", $results);
 
     //  3. Iterate over the results, and...
     foreach ($results as $search) {
@@ -52,6 +52,8 @@
             } else if ( strripos($re_match['host'], 'google.com') !== false ) {
                 $host = 'google.com';
                 if ( preg_match('|/search\?.*q=(?P<terms>[^&]+)|', $query, $re_match) === 1 ) {
+                    $terms = urldecode($re_match['terms']);
+                } else if ( preg_match('|/.*#q=(?P<terms>[^&]+)|', $query, $re_match) === 1 ) {
                     $terms = urldecode($re_match['terms']);
                 }
             } else {
